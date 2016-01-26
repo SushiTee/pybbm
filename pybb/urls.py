@@ -2,9 +2,9 @@
 
 from __future__ import unicode_literals
 try:
-    from django.conf.urls import patterns, include, url
+    from django.conf.urls import include, url
 except ImportError:
-    from django.conf.urls.defaults import patterns, include, url
+    from django.conf.urls.defaults import include, url
 
 from pybb.defaults import PYBB_NICE_URL
 from pybb.feeds import LastPosts, LastTopics
@@ -12,16 +12,17 @@ from pybb.views import IndexView, CategoryView, ForumView, TopicView,\
     AddPostView, EditPostView, UserView, PostView, ProfileEditView,\
     DeletePostView, StickTopicView, UnstickTopicView, CloseTopicView,\
     OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView,\
-    UserTopics, UserPosts, topic_cancel_poll_vote
+    UserTopics, UserPosts, topic_cancel_poll_vote, block_user, unblock_user,\
+    delete_subscription, add_subscription, post_ajax_preview, mark_all_as_read
 
 
-urlpatterns = patterns('',
+urlpatterns = (
                        # Syndication feeds
                        url('^feeds/posts/$', LastPosts(), name='feed_posts'),
                        url('^feeds/topics/$', LastTopics(), name='feed_topics'),
                        )
 
-urlpatterns += patterns('pybb.views',
+urlpatterns += (
                         # Index, Category, Forum
                         url('^$', IndexView.as_view(), name='index'),
                         url('^category/(?P<pk>\d+)/$', CategoryView.as_view(), name='category'),
@@ -29,8 +30,8 @@ urlpatterns += patterns('pybb.views',
 
                         # User
                         url('^users/(?P<username>[^/]+)/$', UserView.as_view(), name='user'),
-                        url('^block_user/([^/]+)/$', 'block_user', name='block_user'),
-                        url('^unblock_user/([^/]+)/$', 'unblock_user', name='unblock_user'),
+                        url('^block_user/([^/]+)/$', block_user, name='block_user'),
+                        url('^unblock_user/([^/]+)/$', unblock_user, name='unblock_user'),
                         url(r'^users/(?P<username>[^/]+)/topics/$', UserTopics.as_view(), name='user_topics'),
                         url(r'^users/(?P<username>[^/]+)/posts/$', UserPosts.as_view(), name='user_posts'),
 
@@ -62,19 +63,19 @@ urlpatterns += patterns('pybb.views',
 
                         # Subscription
                         url('^subscription/topic/(\d+)/delete/$',
-                            'delete_subscription', name='delete_subscription'),
+                            delete_subscription, name='delete_subscription'),
                         url('^subscription/topic/(\d+)/add/$',
-                            'add_subscription', name='add_subscription'),
+                            add_subscription, name='add_subscription'),
 
                         # API
-                        url('^api/post_ajax_preview/$', 'post_ajax_preview', name='post_ajax_preview'),
+                        url('^api/post_ajax_preview/$', post_ajax_preview, name='post_ajax_preview'),
 
                         # Commands
-                        url('^mark_all_as_read/$', 'mark_all_as_read', name='mark_all_as_read')
+                        url('^mark_all_as_read/$', mark_all_as_read, name='mark_all_as_read')
                         )
 
 if PYBB_NICE_URL:
-    urlpatterns += patterns('pybb.views',
+    urlpatterns += (
                             url(r'^c/(?P<slug>[\w-]+)/$', CategoryView.as_view(), name='category'),
                             url(r'^c/(?P<category_slug>[\w-]+)/(?P<slug>[\w-]+)/$', ForumView.as_view(),
                                 name='forum'),
